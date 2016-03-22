@@ -8,11 +8,13 @@ defmodule Card do
     c: %{ name: 'CLUBS',    char: "♣" }
   }
 
-  def rank(%Card{rank: 1 }),   do: 'A'
+  def suits, do: Map.keys(@suits)
+
   def rank(%Card{rank: 10}),   do: 'T'
   def rank(%Card{rank: 11}),   do: 'J'
   def rank(%Card{rank: 12}),   do: 'Q'
   def rank(%Card{rank: 13}),   do: 'K'
+  def rank(%Card{rank: 14}),   do: 'A'
   def rank(%Card{rank: rank}), do: rank
 
   def suit(%Card{suit: suit}), do: @suits[suit][:name]
