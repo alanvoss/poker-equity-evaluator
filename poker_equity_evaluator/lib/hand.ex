@@ -26,6 +26,7 @@ defmodule Hand do
     || _is_four_of_a_kind(hand, ranks)
     || _is_full_house(possible_three_of_a_kind, possible_pair)
     || possible_flush
+    || _is_straight(hand)
     || possible_three_of_a_kind
     || _is_two_pair(hand, ranks)
     || possible_pair
@@ -56,7 +57,7 @@ defmodule Hand do
   defp _is_royal_flush(possible_straight_flush) do
     if possible_straight_flush do
       %{hand: :straight_flush, high: high, suit: suit} = possible_straight_flush
-      if Card.rank(high) == 'A' do
+      if Card.rank(high) == "A" do
         %{hand: :royal_flush, high: high, suit: suit}
       end
     end
@@ -88,7 +89,7 @@ defmodule Hand do
     rank = _find_highest_rank_with_count(ranks, 4)
     if rank do
       cards = ranks[rank]
-      %{hand: :four_of_a_kind, rank: rank, kickers: Enum.at(Deck.remove(hand, cards), 0)}
+      %{hand: :four_of_a_kind, rank: rank, kickers: [Enum.at(Deck.remove(hand, cards), 0)]}
     end
   end
 
