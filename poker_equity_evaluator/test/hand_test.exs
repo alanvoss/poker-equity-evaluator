@@ -70,6 +70,16 @@ defmodule HandTest do
     %{hand: :straight_flush, high: high, suit: suit} = straight_flush 
     assert high.rank == 7
     assert suit == :c
+
+    straight_flush = high(hand( ~w{2C 3C 4C 5C 6C AC KC} ))
+    %{hand: :straight_flush, high: high, suit: suit} = straight_flush 
+    assert high.rank == 6
+    assert suit == :c
+
+    straight_flush = high(hand( ~w{2C 3C 4C 5C 6C 9D KC} ))
+    %{hand: :straight_flush, high: high, suit: suit} = straight_flush 
+    assert high.rank == 6
+    assert suit == :c
   end
 
   test "royal flush" do

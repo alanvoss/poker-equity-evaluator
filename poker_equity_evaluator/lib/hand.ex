@@ -19,10 +19,10 @@ defmodule Hand do
     possible_flush = _is_flush(suits)
     possible_three_of_a_kind = _is_three_of_a_kind(hand, ranks)
     possible_pair = _is_pair(hand, ranks)
-    possible_stright_flush = _is_straight_flush(suits, possible_flush)
+    possible_straight_flush = _is_straight_flush(suits, possible_flush)
 
-    _is_royal_flush(possible_stright_flush)
-    || possible_stright_flush
+    _is_royal_flush(possible_straight_flush)
+    || possible_straight_flush 
     || _is_four_of_a_kind(hand, ranks)
     || _is_full_house(possible_three_of_a_kind, possible_pair)
     || possible_flush
@@ -48,6 +48,7 @@ defmodule Hand do
     || _two_pair_high_sorter(hand1, hand2)
     || _pair_high_sorter(hand1, hand2)
     || _high_card_high_sorter(hand1, hand2)
+    || false
   end
 
   def high_sorter(hand1, hand2) do
@@ -182,14 +183,14 @@ defmodule Hand do
     end
   end
 
-  defp _two_pair_high_sorter(
+  def _two_pair_high_sorter(
     %{hand: :two_pair, high_rank: high_rank1, low_rank: low_rank1, kickers: kickers1},
     %{hand: :two_pair, high_rank: high_rank2, low_rank: low_rank2, kickers: kickers2}
   ) do
     high_rank1 >= high_rank2 and low_rank1 >= low_rank2
       and Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
   end
-  defp _two_pair_high_sorter(_, _), do: nil
+  def _two_pair_high_sorter(_, _), do: nil
 
   defp _is_pair(hand, ranks) do
     rank = _find_highest_rank_with_count(ranks, 2)
@@ -214,6 +215,7 @@ defmodule Hand do
   defp _high_card_high_sorter(%{hand: :high_card, kickers: kickers1}, %{hand: :high_card, kickers: kickers2}) do
     Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
   end
+  defp _high_card_high_sorter(_, _), do: nil
 
   defp _find_highest_rank_with_count(ranks, count) do
     Enum.find(Enum.reverse(Map.keys(ranks)), fn(rank) -> length(ranks[rank]) == count end)
@@ -226,7 +228,7 @@ defmodule Hand do
     if prev - this == 1 do
       _is_consecutive(rest, remaining - 1, this, highest_rank)
     else
-      _is_consecutive(rest, 5, nil, nil)
+      _is_consecutive(rest, 4, this, this)
     end
   end
 
