@@ -1,14 +1,7 @@
 defmodule HandTest do
   import Hand
+  import HandTestHelper
   use ExUnit.Case, async: true
-
-  defp hand(card_strings) do
-    Enum.map(card_strings, fn(card) -> Card.card(card) end)
-  end
-
-  defp ranks(cards) do
-    Enum.map(cards, fn(card) -> card.rank end)
-  end
 
   test "high card" do
     high_card = high(hand( ~w{AC TD 8H 9C 3D 4H 6H} ))
@@ -56,6 +49,11 @@ defmodule HandTest do
     %{hand: :full_house, rank: rank, over: over} = full_house
     assert rank == 4
     assert over == 3
+
+    full_house = high(hand( ~w{AC QH JD 9C AD AS QC} ))
+    %{hand: :full_house, rank: rank, over: over} = full_house
+    assert rank == 14
+    assert over == 12
   end
 
   test "four of a kind" do
@@ -80,6 +78,11 @@ defmodule HandTest do
     %{hand: :straight_flush, high: high, suit: suit} = straight_flush 
     assert high.rank == 6
     assert suit == :c
+
+    straight_flush = high(hand( ~w{2H 3H 4H 5H 6C AH KC} ))
+    %{hand: :straight_flush, high: high, suit: suit} = straight_flush 
+    assert high.rank == 5
+    assert suit == :h
   end
 
   test "royal flush" do
@@ -87,18 +90,5 @@ defmodule HandTest do
     %{hand: :royal_flush, high: high, suit: suit} = royal_flush
     assert high.rank == 14
     assert suit == :d
-  end
-
-  test "sorts hands properly" do
-    high_card = high(hand( ~w{AC TD 8H 9C 3D 4H 6H} ))
-    four_of_a_kind = high(hand( ~w{4C 4H JD 9C 4D 4S 3C} ))
-    straight = high(hand( ~w{KC QD JD KH TC 4H 9H} ))
-
-    [best, middle, worst] =
-      Enum.sort([high_card, four_of_a_kind, straight], &Hand.high_sorter(&1, &2))
-
-    assert best == four_of_a_kind
-    assert middle == straight
-    assert worst == high_card
   end
 end
