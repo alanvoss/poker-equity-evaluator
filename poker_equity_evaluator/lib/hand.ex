@@ -58,7 +58,7 @@ defmodule Hand do
   defp _is_royal_flush(possible_straight_flush) do
     if possible_straight_flush do
       %{hand: :straight_flush, high: high, suit: suit} = possible_straight_flush
-      if Card.rank(high) == "A" do
+      if high == 14 do
         %{hand: :royal_flush, high: high, suit: suit}
       end
     end
@@ -83,7 +83,7 @@ defmodule Hand do
     %{hand: :straight_flush, high: high1},
     %{hand: :straight_flush, high: high2}
   ) do
-    high1.rank >= high2.rank
+    high1 >= high2
   end
   defp _straight_flush_high_sorter(_, _), do: nil
 
@@ -91,7 +91,8 @@ defmodule Hand do
     rank = _find_highest_rank_with_count(ranks, 4)
     if rank do
       cards = ranks[rank]
-      %{hand: :four_of_a_kind, rank: rank, kickers: [Enum.at(Deck.remove(hand, cards), 0)]}
+      kicker = Enum.at(Deck.remove(hand, cards), 0).rank
+      %{hand: :four_of_a_kind, rank: rank, kickers: [kicker]}
     end
   end
 
@@ -99,7 +100,7 @@ defmodule Hand do
     %{hand: :four_of_a_kind, rank: rank1, kickers: kickers1 },
     %{hand: :four_of_a_kind, rank: rank2, kickers: kickers2 }
   ) when rank1 == rank2 do
-    Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
+    kickers1 >= kickers2
   end
   defp _four_of_a_kind_high_sorter(
     %{hand: :four_of_a_kind, rank: rank1},
@@ -143,12 +144,12 @@ defmodule Hand do
   defp _is_flush(suits) do
     {suit, count} = _suit_with_most_cards(suits)
     if count >= 5 do
-      %{hand: :flush, suit: suit, high: Enum.at(suits[suit], 0)}
+      %{hand: :flush, suit: suit, high: Enum.at(suits[suit], 0).rank}
     end
   end
 
   defp _flush_high_sorter(%{hand: :flush, high: high1}, %{hand: :flush, high: high2}) do
-    high1.rank >= high2.rank
+    high1 >= high2
   end
   defp _flush_high_sorter(_, _), do: nil
 
@@ -161,17 +162,17 @@ defmodule Hand do
       unique_rank_cards = unique_rank_cards ++ [%Card{rank: 1, suit: possible_ace.suit}]
     end
 
-    ranks = Enum.map(unique_rank_cards, fn(card) -> card.rank end)
+    ranks = Enum.map(unique_rank_cards, &(&1.rank))
     highest_rank = _is_consecutive(ranks, 5, nil, nil)
     high = Enum.find(hand, fn(card) -> card.rank == highest_rank end)
 
     if high do
-      %{hand: :straight, high: high}
+      %{hand: :straight, high: high.rank}
     end
   end
 
   defp _straight_high_sorter(%{hand: :straight, high: high1}, %{hand: :straight, high: high2}) do
-    high1.rank >= high2.rank
+    high1 >= high2
   end
   defp _straight_high_sorter(_, _), do: nil
 
@@ -179,7 +180,8 @@ defmodule Hand do
     rank = _find_highest_rank_with_count(ranks, 3)
     if rank do
       cards = ranks[rank]
-      %{hand: :three_of_a_kind, rank: rank, kickers: Enum.take(Deck.remove(hand, cards), 2)}
+      kickers = Enum.map(Enum.take(Deck.remove(hand, cards), 2), &(&1.rank))
+      %{hand: :three_of_a_kind, rank: rank, kickers: kickers}
     end
   end
 
@@ -187,7 +189,7 @@ defmodule Hand do
     %{hand: :three_of_a_kind, rank: rank1, kickers: kickers1},
     %{hand: :three_of_a_kind, rank: rank2, kickers: kickers2}
   ) when rank1 == rank2 do
-    Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
+    kickers1 >= kickers2
   end
   defp _three_of_a_kind_high_sorter(
     %{hand: :three_of_a_kind, rank: rank1},
@@ -206,8 +208,9 @@ defmodule Hand do
       high_rank_cards = ranks[high_rank]
       low_rank = Enum.at(pair_ranks, 1)
       low_rank_cards = ranks[low_rank]
+      kickers = Enum.map(Enum.take(Deck.remove(hand, high_rank_cards ++ low_rank_cards), 1), &(&1.rank))
       %{hand: :two_pair, high_rank: high_rank, low_rank: low_rank,
-        kickers: Enum.take(Deck.remove(hand, high_rank_cards ++ low_rank_cards), 1)}
+        kickers: kickers}
     end
   end
 
@@ -215,7 +218,7 @@ defmodule Hand do
     %{hand: :two_pair, high_rank: high_rank1, low_rank: low_rank1, kickers: kickers1},
     %{hand: :two_pair, high_rank: high_rank2, low_rank: low_rank2, kickers: kickers2}
   ) when high_rank1 == high_rank2 and low_rank1 == low_rank2 do
-    Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
+    kickers1 >= kickers2
   end
   def _two_pair_high_sorter(
     %{hand: :two_pair, high_rank: high_rank1, low_rank: low_rank1},
@@ -235,7 +238,8 @@ defmodule Hand do
     rank = _find_highest_rank_with_count(ranks, 2)
     if rank do
       cards = ranks[rank]
-      %{hand: :pair, rank: rank, kickers: Enum.take(Deck.remove(hand, cards), 3)}
+      kickers = Enum.map(Enum.take(Deck.remove(hand, cards), 3), &(&1.rank))
+      %{hand: :pair, rank: rank, kickers: kickers}
     end
   end
 
@@ -243,7 +247,7 @@ defmodule Hand do
     %{hand: :pair, rank: rank1, kickers: kickers1},
     %{hand: :pair, rank: rank2, kickers: kickers2}
   ) when rank1 == rank2 do
-    Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
+    kickers1 >= kickers2
   end
   defp _pair_high_sorter(
     %{hand: :pair, rank: rank1},
@@ -254,11 +258,11 @@ defmodule Hand do
   defp _pair_high_sorter(_, _), do: nil
 
   defp _is_high_card(hand) do
-    %{hand: :high_card, kickers: Enum.take(hand, 5)}
+    %{hand: :high_card, kickers: Enum.map(Enum.take(hand, 5), &(&1.rank))}
   end
 
   defp _high_card_high_sorter(%{hand: :high_card, kickers: kickers1}, %{hand: :high_card, kickers: kickers2}) do
-    Enum.map(kickers1, &(&1.rank)) >= Enum.map(kickers2, &(&1.rank))
+    kickers1 >= kickers2
   end
   defp _high_card_high_sorter(_, _), do: nil
 

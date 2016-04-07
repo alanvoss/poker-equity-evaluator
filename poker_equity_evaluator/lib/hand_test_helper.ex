@@ -3,10 +3,6 @@ defmodule HandTestHelper do
     Enum.map(card_strings, fn(card) -> Card.card(card) end)
   end
 
-  def ranks(cards) do
-    Enum.map(cards, fn(card) -> card.rank end)
-  end
-
   def original_indexes({new, original}) do
     Enum.map(new, fn(hand) ->
       Enum.find_index(original, fn(original_hand) ->
