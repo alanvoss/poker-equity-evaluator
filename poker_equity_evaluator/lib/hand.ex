@@ -13,7 +13,7 @@ defmodule Hand do
   }
 
   def high(hand) do
-    hand = Enum.sort_by(hand, fn(card) -> 15 - card.rank end)
+    hand = Enum.sort_by(hand, &(15 - &1.rank))
     ranks = _divide_by_ranks(hand)
     suits = _divide_by_suits(hand)
     possible_flush = _is_flush(suits)
@@ -118,7 +118,7 @@ defmodule Hand do
       eligible_ranks = Enum.filter([
         _find_highest_rank_with_count(remaining_ranks, 3),
         _find_highest_rank_with_count(remaining_ranks, 2)
-      ], fn(x) -> x end)
+      ], &(&1))
 
       if length(eligible_ranks) > 0 do
         max = Enum.max(eligible_ranks)
@@ -154,7 +154,7 @@ defmodule Hand do
   defp _flush_high_sorter(_, _), do: nil
 
   defp _is_straight(hand) do
-    unique_rank_cards = Enum.dedup_by(hand, fn(card) -> card.rank end)
+    unique_rank_cards = Enum.dedup_by(hand, &(&1.rank))
     possible_ace = Enum.at(unique_rank_cards, 0)
 
     if Card.rank(possible_ace) == "A" do
@@ -164,7 +164,7 @@ defmodule Hand do
 
     ranks = Enum.map(unique_rank_cards, &(&1.rank))
     highest_rank = _is_consecutive(ranks, 5, nil, nil)
-    high = Enum.find(hand, fn(card) -> card.rank == highest_rank end)
+    high = Enum.find(hand, &(&1.rank == highest_rank))
 
     if high do
       %{hand: :straight, high: high.rank}
@@ -267,7 +267,7 @@ defmodule Hand do
   defp _high_card_high_sorter(_, _), do: nil
 
   defp _find_highest_rank_with_count(ranks, count) do
-    Enum.find(Enum.reverse(Map.keys(ranks)), fn(rank) -> length(ranks[rank]) == count end)
+    Enum.find(Enum.reverse(Map.keys(ranks)), &(length(ranks[&1]) == count))
   end
 
   defp _is_consecutive([this | rest], remaining, nil, nil), do: _is_consecutive(rest, remaining - 1, this, this)
@@ -295,7 +295,7 @@ defmodule Hand do
 
   defp _suit_with_most_cards(divided_suits) do
     suits = Map.keys(divided_suits)
-    suits_with_counts = Enum.map(suits, fn(suit) -> { suit, length(divided_suits[suit]) } end)
+    suits_with_counts = Enum.map(suits, &({ &1, length(divided_suits[&1]) }))
     Enum.max_by(suits_with_counts, fn({_suit, count}) -> count end)
   end
 end

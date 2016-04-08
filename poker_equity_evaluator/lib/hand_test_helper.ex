@@ -5,8 +5,7 @@ defmodule HandTestHelper do
 
   def original_indexes({new, original}) do
     Enum.map(new, fn(hand) ->
-      Enum.find_index(original, fn(original_hand) ->
-        hand == original_hand end) end)
+      Enum.find_index(original, &(hand == &1)) end)
   end
 
   def compare_sorted_indexes(hands, indexes) do

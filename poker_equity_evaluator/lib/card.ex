@@ -18,7 +18,7 @@ defmodule Card do
 
   @rank_translations Map.merge(
     Map.new(Enum.map(Map.to_list(@rank_abbreviations), fn({k, v}) -> {v, k} end)),
-    Map.new(Enum.map(2..9, fn(rank) -> {<<rank + 48>>, rank} end))
+    Map.new(Enum.map(2..9, &({<<&1 + 48>>, &1})))
   )
 
   def suits, do: Map.keys(@suits)
@@ -32,7 +32,7 @@ defmodule Card do
   def card({[rank], suit}), do: card({<<rank>>, suit})
   def card({rank, [suit]}), do: card({rank, <<suit>>})
   def card({rank, suit}) do
-    suit = Enum.find(Map.keys(@suits), fn(s) -> suit == s end)
+    suit = Enum.find(Map.keys(@suits), &(suit == &1))
     if suit && rank <= 14 && rank >= 2, do: %Card{rank: rank, suit: suit}, else: nil
   end
 
