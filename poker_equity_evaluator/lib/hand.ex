@@ -55,6 +55,10 @@ defmodule Hand do
     @hands[hand1[:hand]] >= @hands[hand2[:hand]]
   end
 
+  def equal(hand1, hand2) do
+    Map.delete(hand1, :suit) == Map.delete(hand2, :suit)
+  end
+
   defp _is_royal_flush(possible_straight_flush) do
     if possible_straight_flush do
       %{hand: :straight_flush, high: high, suit: suit} = possible_straight_flush
@@ -164,10 +168,9 @@ defmodule Hand do
 
     ranks = Enum.map(unique_rank_cards, &(&1.rank))
     highest_rank = _is_consecutive(ranks, 5, nil, nil)
-    high = Enum.find(hand, &(&1.rank == highest_rank))
 
-    if high do
-      %{hand: :straight, high: high.rank}
+    if highest_rank do
+      %{hand: :straight, high: highest_rank}
     end
   end
 
@@ -204,9 +207,8 @@ defmodule Hand do
       -> if length(ranks[rank]) == 2, do: acc ++ [rank], else: acc end)
 
     if length(pair_ranks) >= 2 do
-      high_rank = Enum.at(pair_ranks, 0)
+      [high_rank, low_rank] = Enum.take(pair_ranks, 2)
       high_rank_cards = ranks[high_rank]
-      low_rank = Enum.at(pair_ranks, 1)
       low_rank_cards = ranks[low_rank]
       kickers = Enum.map(Enum.take(Deck.remove(hand, high_rank_cards ++ low_rank_cards), 1), &(&1.rank))
       %{hand: :two_pair, high_rank: high_rank, low_rank: low_rank,
