@@ -73,15 +73,18 @@ defmodule HandDifferencesTest do
 
   test "flush" do
     hands = [
-      hand( ~w{KC QC JD 9C TC 4H 3C} ), # K
-      hand( ~w{5C 2C JC 9C TC 4H 3D} ), # J
-      hand( ~w{6C 5C 2C 4C 7C 4H KH} ), # 7
-      hand( ~w{5C 2C 6C 9C TC 4H 3D} ), # T
-      hand( ~w{KC QC JD AC 7C 4H 3C} )  # A
+      hand( ~w{KC QC JD 9C TC 4H 3C} ), # K, Q      # 1
+      hand( ~w{KC 6C JD 9C TC 4H 3C} ), # K, T      # 4
+      hand( ~w{5C 2C JC 9C TC 4H 3D} ), # J         # 5
+      hand( ~w{KC JC JD 9C TC 4H 3C} ), # K, J, T   # 2
+      hand( ~w{6C 5C 2C 4C 7C 4H KH} ), # 7         # 7
+      hand( ~w{KC JC JD 9C 8C 4H 3C} ), # K, J, 9   # 3
+      hand( ~w{5C 2C 6C 9C TC 4H 3D} ), # T         # 6
+      hand( ~w{KC QC JD AC 7C 4H 3C} )  # A         # 0
     ]
 
     assert hand_types(hands, :flush)
-    assert compare_sorted_indexes(hands, [4, 0, 1, 3, 2])
+    assert compare_sorted_indexes(hands, [7, 0, 3, 5, 1, 2, 6, 4])
   end
 
   test "full house" do

@@ -39,9 +39,9 @@ defmodule HandTest do
 
   test "flush" do
     flush = high(hand( ~w{KC QC JD 9C TC 4H 3C} ))
-    %{hand: :flush, suit: suit, high: high} = flush 
+    %{hand: :flush, suit: suit, ranks: ranks} = flush
     assert suit == :c
-    assert high == 13
+    assert ranks == [13, 12, 10, 9, 3]
   end
 
   test "full house" do

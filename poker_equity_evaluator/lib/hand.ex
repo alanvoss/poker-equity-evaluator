@@ -148,12 +148,12 @@ defmodule Hand do
   defp _is_flush(suits) do
     {suit, count} = _suit_with_most_cards(suits)
     if count >= 5 do
-      %{hand: :flush, suit: suit, high: Enum.at(suits[suit], 0).rank}
+      %{hand: :flush, suit: suit, ranks: Enum.map(suits[suit], &(&1.rank))}
     end
   end
 
-  defp _flush_high_sorter(%{hand: :flush, high: high1}, %{hand: :flush, high: high2}) do
-    high1 >= high2
+  defp _flush_high_sorter(%{hand: :flush, ranks: ranks1}, %{hand: :flush, ranks: ranks2}) do
+    ranks1 >= ranks2
   end
   defp _flush_high_sorter(_, _), do: nil
 
