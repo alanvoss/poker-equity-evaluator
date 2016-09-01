@@ -44,6 +44,13 @@ defmodule HandTest do
     assert ranks == [13, 12, 10, 9, 3]
   end
 
+  test "flush (with 6 cards)" do
+    flush = high(hand( ~w{KC QC JD 9C TC 2C 3C} ))
+    %{hand: :flush, suit: suit, ranks: ranks} = flush
+    assert suit == :c
+    assert ranks == [13, 12, 10, 9, 3]
+  end
+
   test "full house" do
     full_house = high(hand( ~w{4C 3H JD 9C 4D 4S 3C} ))
     %{hand: :full_house, rank: rank, over: over} = full_house

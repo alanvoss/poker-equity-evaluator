@@ -148,7 +148,7 @@ defmodule Hand do
   defp _is_flush(suits) do
     {suit, count} = _suit_with_most_cards(suits)
     if count >= 5 do
-      %{hand: :flush, suit: suit, ranks: Enum.map(suits[suit], &(&1.rank))}
+      %{hand: :flush, suit: suit, ranks: Enum.take(Enum.map(suits[suit], &(&1.rank)), 5)}
     end
   end
 
